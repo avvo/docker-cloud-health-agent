@@ -11,7 +11,7 @@ RUN apt-get update && \
     apt-get install -y curl procps wget sudo sed && \
     apt-get clean
 
-# ADD ec2_hack.rb /ec2_hack.rb
+ADD ec2_hack.rb /ec2_hack.rb
 ADD install_perfmon.sh /install_perfmon.sh
 RUN bash -x /install_perfmon.sh $CLOUD_HEALTH_SECRET $CLOUD_HEALTH_VERSION $CLOUD
 RUN rm /install_perfmon.sh
@@ -22,6 +22,7 @@ RUN rm /start_perfmon_temp.sh
 
 # Blow away the config; the entrypoint creates a new one before starting cht_perfmon
 RUN sudo /etc/init.d/cht_perfmon stop
+RUN mv /ec2_hack.rb $(find /opt/cht_perfmon/embedded -name ec2.rb | grep lib/facter/ec2.rb)
 RUN find /opt/cht_perfmon/embedded -name saved_state.json | xargs rm -f
 RUN rm -f /opt/cht_perfmon/cht_perfmon_collector.output \
           /opt/cht_perfmon/saved_state.json \
